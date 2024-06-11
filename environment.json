@@ -1,0 +1,72 @@
+{
+  "TRADING_BROKER_NAME": "BINANCE",
+  "DATA_ACCOUNT_TIME_ZONE": "Europe/Tallinn",
+  "TRADE_ACCOUNT_TIME_ZONE": "Europe/Tallinn",
+  "DATA_ACCOUNT_TIME_DICT": {
+    "hours": 2,
+    "minutes": 0
+  },
+  "TRADE_ACCOUNT_TIME_DICT": {
+    "hours": 2,
+    "minutes": 0
+  },
+  "TRADING_PAIR_DICT": {
+    "BTCUSDT": {
+      "spread": 0.00003,
+      "BINANCE": "BTCUSDT",
+      "allowedNumberOfBuyTrades": 4,
+      "allowedNumberOfSellTrades": 4,
+      "decimalPlaces": 8,
+      "contractSize": 100000,
+      "closingTimeCandle": "23:45:00",
+      "openingTime": "00:05:00",
+      "oneDirection": "OFF"
+    },
+    "ETHUSDT": {
+      "spread": 0.2,
+      "BINANCE": "ETHUSDT",
+      "allowedNumberOfBuyTrades": 4,
+      "allowedNumberOfSellTrades": 4,
+      "decimalPlaces": 8,
+      "contractSize": 100,
+      "closingTimeCandle": "23:45:00",
+      "openingTime": "01:05:00",
+      "oneDirection": "OFF"
+    }
+  },
+  "PAST_CANDLE_COUNT": 35,
+  "THRESHOLD_PERCENT": 0.05,
+  "PAST_DATA_FOR_TRAILING_STOP_LOSS": 50,
+  "BOT_TIME_START": "00:00:00",
+  "BOT_TIME_END": "23:59:59",
+  "TRADING_TIME_START": "00:00:00",
+  "TRADING_TIME_END": "23:59:59",
+  "BOT_STATUS": "ON",
+  "TRAILING_STOP_LOSS_SIZE_MULTIPLIER": 0.5,
+  "TRADE_STOP_LOSS_SIZE_MULTIPLIER": 0.5,
+  "CANDLE_PERIOD": "15m",
+  "RISK_AMOUNT": 100,
+  "TREND_UP_STRATEGY": "OFF",
+  "ORDER_COMMENT": "Original Script",
+  "FRIDAY_CLOSE": "OFF",
+  "FRIDAY_CLOSE_TIME": "21:00:00",
+  "DAILY_CLOSE": "OFF",
+  "DAILY_CLOSE_TIME": "21:00:00",
+  "NEWS_DICT": [
+    {
+      "NEWS_DATE": "19/03/2024",
+      "NEWS_BLOCK_START": "15:13:00",
+      "NEWS_BLOCK_END": "15:14:00"
+    },
+    {
+      "NEWS_DATE": "19/04/2024",
+      "NEWS_BLOCK_START": "00:00:00",
+      "NEWS_BLOCK_END": "23:59:59"
+    }
+  ],
+  "TREND_UP_INITIAL_CANDLES": 120,
+  "MIN_MAX_CONTROLLER": "DATA",
+  "THRESHOLD_CALCULATION_STRATEGY": "ON",
+  "OUTSIDE_BAR_STRATEGY": "OFF",
+  "TRADE_ENTRY_SECOND": 1
+}
