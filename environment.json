@@ -3,11 +3,11 @@
   "DATA_ACCOUNT_TIME_ZONE": "Europe/Tallinn",
   "TRADE_ACCOUNT_TIME_ZONE": "Europe/Tallinn",
   "DATA_ACCOUNT_TIME_DICT": {
-    "hours": 2,
+    "hours": -5,
     "minutes": 0
   },
   "TRADE_ACCOUNT_TIME_DICT": {
-    "hours": 2,
+    "hours": -5,
     "minutes": 0
   },
   "TRADING_PAIR_DICT": {
