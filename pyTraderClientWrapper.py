@@ -1,3 +1,4 @@
+import asyncio
 import json
 import random
 import time
@@ -36,7 +37,11 @@ elif CANDLE_PERIOD == '5m':
                               (2090, 2100), (2390, 2400), (2690, 2700), (2990, 3000), (3290, 3300), (3590, 3600)]
 
 
-def getPrice(client, symbol):
+trading_pair_dict = environment_data['TRADING_PAIR_DICT']
+trading_pairs = list(trading_pair_dict.keys())
+
+
+async def getPrice(client, symbol):
     """
         Function to get the current market data for a given symbol.
 
@@ -313,7 +318,7 @@ async def doTradeScenario(client, dataAccountClient, symbol, actionType, contrac
         controller_client = dataAccountClient
 
     current_system_time = get_data_account_time()
-    openPrice = getPrice(client, symbol)
+    openPrice = await getPrice(client, symbol)
     openPrice = float(openPrice['bid'])
     pastData = await get15MinHistoricalData(controller_client, symbol, CANDLE_PERIOD, is_data_account, limit)
     if not isWithInTradeInterval(current_system_time):
@@ -470,7 +475,7 @@ def isWithInTradeInterval(current_time):
     return False
 
 
-def updatePosition(client, positionId, stopLoss):
+async def updatePosition(client, positionId, stopLoss, symbol, previousStopLoss):
     """
     Function to update the position of a trade.
 
@@ -483,11 +488,11 @@ def updatePosition(client, positionId, stopLoss):
         dict: The response from the API as a dictionary.
     """
     # send telegram message
-    send_telegram_message(TELEGRAM_CHAT_ID, f"Updating position {positionId} with stop loss {stopLoss}")
+    await send_telegram_message(TELEGRAM_CHAT_ID, f"Updating SL for {symbol} | PositionID: {positionId} | SL: {stopLoss} | Previous SL: {previousStopLoss} | Time: {get_trade_account_time()}")
     return True
 
 
-def getActivePositions(client) -> list:
+async def getActivePositions(client) -> list:
     """
     Function to get the active positions.
 
@@ -497,15 +502,41 @@ def getActivePositions(client) -> list:
     Returns:
         dict: The response from the API as a dictionary.
     """
-    temp_list = []
-    result = client.Get_all_open_positions()['ticket']
-    if result is not None:
-        for r in result:
-            temp_dict = {
-                "positionId": r
-            }
-            temp_list.append(temp_dict)
-    return temp_list
+    active_trades_data = loadActiveTradeData()
+    active_positions = []
+    coroutines = [getPrice(client, symbol) for
+                  symbol in
+                  trading_pairs]
+    results = await asyncio.gather(*coroutines)
+    symbolPrices = dict(zip(trading_pairs, results))
+    for active_trade_data in active_trades_data:
+        symbol = active_trade_data['symbol']
+        positionId = active_trade_data['trade']['positionId']
+        stopLoss = active_trade_data['stopLoss']
+        openPrice = active_trade_data['openPrice']
+        temp_dict = {
+            "positionId": positionId,
+        }
+        actionType = active_trade_data['actionType']
+        if actionType == ORDER_TYPE_BUY:
+            current_symbol_price = symbolPrices[symbol]['ask']
+            if current_symbol_price > stopLoss:
+                active_positions.append(temp_dict)
+            else:
+                calculate_profit = stopLoss - openPrice
+                calculate_percent = (calculate_profit / openPrice) * 100
+                message = f"Position Closed {positionId} | Time: {str(get_trade_account_time())} | Symbol: {symbol} | Open Price: {openPrice} | Stop Loss: {stopLoss} | Current Price: {current_symbol_price} | Profit Gained: {calculate_profit} | Profit Gain Percentage: {calculate_percent}"
+                await send_telegram_message(TELEGRAM_CHAT_ID, message)
+        else:
+            current_symbol_price = symbolPrices[symbol]['bid']
+            if current_symbol_price < stopLoss:
+                active_positions.append(temp_dict)
+            else:
+                calculate_profit = openPrice - stopLoss
+                calculate_percent = (calculate_profit / openPrice) * 100
+                message = f"Position Closed {positionId} | Time: {str(get_trade_account_time())} | Symbol: {symbol} | Open Price: {openPrice} | Stop Loss: {stopLoss} | Current Price: {current_symbol_price} | Profit Gained: {calculate_profit} | Profit Gain Percentage: {calculate_percent}"
+                await send_telegram_message(TELEGRAM_CHAT_ID, message)
+    return active_positions
 
 
 async def getAccountInfo(client):

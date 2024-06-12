@@ -263,15 +263,15 @@ async def UpdateStopLossofTrade(tradeAccount, current_datetime, dataAccount):
         trades_data = pWX.loadTradeData()
         active_trades_data = pWX.loadActiveTradeData()
 
-        # positions = pWX.getActivePositions(tradeAccount)
-        #
-        # if positions is not None:
-        #     # check if the position['id'] is in active_trades_data['trade']['positionId']
-        #     active_trades_data = [active_trade_data for active_trade_data in active_trades_data if
-        #                           'positionId' in active_trade_data['trade'] and
-        #                           any(position['positionId'] == active_trade_data['trade']['positionId'] for position in
-        #                               positions
-        #                               if position is not None and 'positionId' in position)]
+        positions = await pWX.getActivePositions(tradeAccount)
+
+        if positions is not None:
+            # check if the position['id'] is in active_trades_data['trade']['positionId']
+            active_trades_data = [active_trade_data for active_trade_data in active_trades_data if
+                                  'positionId' in active_trade_data['trade'] and
+                                  any(position['positionId'] == active_trade_data['trade']['positionId'] for position in
+                                      positions
+                                      if position is not None and 'positionId' in position)]
 
         processed_trades = []
         # TODO: make this loop async
@@ -296,7 +296,8 @@ async def UpdateStopLossofTrade(tradeAccount, current_datetime, dataAccount):
                                                                                                         trade_data[
                                                                                                             'spread']
                     stopLoss = round(stopLoss, trade_data['decimalPlaces'])
-                    pWX.updatePosition(tradeAccount, trade_data['trade']['positionId'], stopLoss)
+                    await pWX.updatePosition(tradeAccount, trade_data['trade']['positionId'], stopLoss,
+                                             trade_data['symbol'], trade_data['stopLoss'])
                     print(f"Updated stop loss for {trade_data['symbol']} at {str(pWX.get_trade_account_time())}")
                     # log position modification in position_modification_log.txt
                     with open('position_modification_log.txt', 'a') as f:
@@ -544,7 +545,7 @@ async def UpdateTrailingStopLoss(dataAccountClient, tradeAccount, current_time, 
 
                             if validTrade:
                                 active_trade_data['currentStopLoss'] = newStopLoss
-                                response = pWX.updatePosition(tradeAccount, positionId, newStopLoss)
+                                response = await pWX.updatePosition(tradeAccount, positionId, newStopLoss, symbol, currentStopLoss)
                                 if not response:
                                     active_trades_data.remove(active_trade_data)
                                     # log in unexpected_error_log.txt
@@ -618,7 +619,7 @@ async def UpdateTrailingStopLoss(dataAccountClient, tradeAccount, current_time, 
 
                             if validTrade:
                                 active_trade_data['currentStopLoss'] = newStopLoss
-                                response = pWX.updatePosition(tradeAccount, positionId, newStopLoss)
+                                response = await pWX.updatePosition(tradeAccount, positionId, newStopLoss, symbol, currentStopLoss)
                                 if not response:
                                     active_trades_data.remove(active_trade_data)
                                     # log in unexpected_error_log.txt
@@ -770,7 +771,7 @@ async def UpdateOneMinuteTrailingStopLoss(tradeAccount, current_datetime):
 
                         if validTrade:
                             active_trade_data['currentStopLoss'] = newStopLoss
-                            response = pWX.updatePosition(tradeAccount, positionId, newStopLoss)
+                            response = await pWX.updatePosition(tradeAccount, positionId, newStopLoss, symbol, currentStopLoss)
                             if not response:
                                 active_trades_data.remove(active_trade_data)
                                 # log in unexpected_error_log.txt
@@ -832,7 +833,7 @@ async def UpdateOneMinuteTrailingStopLoss(tradeAccount, current_datetime):
 
                         if validTrade:
                             active_trade_data['currentStopLoss'] = newStopLoss
-                            response = pWX.updatePosition(tradeAccount, positionId, newStopLoss)
+                            response = await pWX.updatePosition(tradeAccount, positionId, newStopLoss, symbol, currentStopLoss)
                             if not response:
                                 active_trades_data.remove(active_trade_data)
                                 # log in unexpected_error_log.txt
@@ -927,8 +928,8 @@ async def ProcessPair(account, tradeAccount, pair, dataAccount):
     thresholds = storedData['thresholds'] if storedData else None
     prev_candle = storedData['prev_candle'] if storedData else None
 
-    live_data = pWX.getPrice(account, get_universal_pair(pair))
-    trade_live_data = pWX.getPrice(tradeAccount, get_universal_pair(pair))
+    live_data = await pWX.getPrice(account, get_universal_pair(pair))
+    trade_live_data = await pWX.getPrice(tradeAccount, get_universal_pair(pair))
     if 'bid' not in live_data:
         # log in error_log.txt
         with open('error_log.txt', 'a') as f:
@@ -1447,7 +1448,7 @@ async def MainTradingLoop():
         print(results)
 
         for symbol in trading_account_pairs:
-            print(f"Price for {symbol} is {pWX.getPrice(dataAccountClient, symbol)}")
+            print(f"Price for {symbol} is {await pWX.getPrice(dataAccountClient, symbol)}")
 
         count += 1
 
