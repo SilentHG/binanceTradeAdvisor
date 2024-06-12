@@ -34,7 +34,7 @@ async def getPrice(client, symbol):
             dict: The market data for the given symbol.
         """
 
-    result = client.get_ticker(symbol=symbol)
+    result = client.get_orderbook_ticker(symbol=symbol)
     if result:
         result['date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.000Z")
         result['bid'] = float(result['bidPrice'])
@@ -49,7 +49,7 @@ async def main():
                   trading_pairs]
     results = await asyncio.gather(*coroutines)
     symbolPrices = dict(zip(trading_pairs, results))
-    print(symbolPrices["ETHUSDT"]["ask"])
+    print(symbolPrices["ETHUSDT"]["ask"], symbolPrices["ETHUSDT"]["bid"], symbolPrices["ETHUSDT"]["date"])
 
 
 
