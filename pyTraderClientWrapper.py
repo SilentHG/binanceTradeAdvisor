@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 import pytz
 import requests
+from binance.enums import HistoricalKlinesType
 
 from strategy import log_error, log_general_error
 
@@ -53,7 +54,7 @@ async def getPrice(client, symbol):
             dict: The market data for the given symbol.
         """
 
-    result = client.get_orderbook_ticker(symbol=symbol)
+    result = client.futures_orderbook_ticker(symbol=symbol)
     if result:
         result['date'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.000Z")
         result['bid'] = float(result['bidPrice'])
@@ -122,7 +123,7 @@ async def getHistoricalData(client, symbol, time_frame, limit=0):
     elif time_frame == "5m":
         time_frame = "5m"
 
-    result = client.get_historical_klines(symbol, time_frame, limit=limit+1)
+    result = client.get_historical_klines(symbol, time_frame, limit=limit+1, klines_type=HistoricalKlinesType.FUTURES)
     temp_list = []
     if result is not None:
         for r in result:
