@@ -967,18 +967,18 @@ async def ProcessPair(account, tradeAccount, pair, dataAccount):
         if THRESHOLD_CALCULATION_STRATEGY == "ON":
             if price < thresholds['sellThreshold'] and trendUpData['didTrendDownHappen']:
                 # check if allowed number of sell trades is reached
-                if checkIfAllowedNumberOfTradesReached(pair, trading_broker_pair, SELL):
+                if checkIfAllowedNumberOfTradesReached(pair, trading_broker_pair, BUY):
                     return
 
-                if await checkIfOneDirectionTradeIsOn(pair, trading_broker_pair, BUY):
+                if await checkIfOneDirectionTradeIsOn(pair, trading_broker_pair, SELL):
                     return
 
-                await CreateSellSignal(trading_broker_pair, price, thresholds['sellThreshold'], price_time,
+                await CreateBuySignal(trading_broker_pair, price, thresholds['sellThreshold'], price_time,
                                        current_system_time)
                 await pWX.doTradeScenario(tradeAccount,
                                           dataAccount,
                                           trading_broker_pair,
-                                          SELL,
+                                          BUY,
                                           contractSize,
                                           spread,
                                           ORDER_COMMENT,
@@ -987,18 +987,18 @@ async def ProcessPair(account, tradeAccount, pair, dataAccount):
                                           )
             elif price > thresholds['buyThreshold'] and trendUpData['didTrendUpHappen']:
                 # check if allowed number of buy trades is reached
-                if checkIfAllowedNumberOfTradesReached(pair, trading_broker_pair, BUY):
+                if checkIfAllowedNumberOfTradesReached(pair, trading_broker_pair, SELL):
                     return
 
-                if await checkIfOneDirectionTradeIsOn(pair, trading_broker_pair, SELL):
+                if await checkIfOneDirectionTradeIsOn(pair, trading_broker_pair, BUY):
                     return
 
-                await CreateBuySignal(trading_broker_pair, price, thresholds['buyThreshold'], price_time,
+                await CreateSellSignal(trading_broker_pair, price, thresholds['buyThreshold'], price_time,
                                       current_system_time)
                 await pWX.doTradeScenario(tradeAccount,
                                           dataAccount,
                                           trading_broker_pair,
-                                          BUY,
+                                          SELL,
                                           contractSize,
                                           spread,
                                           ORDER_COMMENT,
@@ -1055,17 +1055,17 @@ async def ProcessPair(account, tradeAccount, pair, dataAccount):
     elif THRESHOLD_CALCULATION_STRATEGY == "ON":
         if price < thresholds['sellThreshold']:
             # check if allowed number of sell trades is reached
-            if checkIfAllowedNumberOfTradesReached(pair, trading_broker_pair, SELL):
+            if checkIfAllowedNumberOfTradesReached(pair, trading_broker_pair, BUY):
                 return
-            if await checkIfOneDirectionTradeIsOn(pair, trading_broker_pair, BUY):
+            if await checkIfOneDirectionTradeIsOn(pair, trading_broker_pair, SELL):
                 return
 
-            await CreateSellSignal(trading_broker_pair, price, thresholds['sellThreshold'], price_time,
+            await CreateBuySignal(trading_broker_pair, price, thresholds['sellThreshold'], price_time,
                                    current_system_time)
             await pWX.doTradeScenario(tradeAccount,
                                       dataAccount,
                                       trading_broker_pair,
-                                      SELL,
+                                      BUY,
                                       contractSize,
                                       spread,
                                       ORDER_COMMENT,
@@ -1075,17 +1075,17 @@ async def ProcessPair(account, tradeAccount, pair, dataAccount):
 
         elif price > thresholds['buyThreshold']:
             # check if allowed number of buy trades is reached
-            if checkIfAllowedNumberOfTradesReached(pair, trading_broker_pair, BUY):
+            if checkIfAllowedNumberOfTradesReached(pair, trading_broker_pair, SELL):
                 return
-            if await checkIfOneDirectionTradeIsOn(pair, trading_broker_pair, SELL):
+            if await checkIfOneDirectionTradeIsOn(pair, trading_broker_pair, BUY):
                 return
 
-            await CreateBuySignal(trading_broker_pair, price, thresholds['buyThreshold'], price_time,
+            await CreateSellSignal(trading_broker_pair, price, thresholds['buyThreshold'], price_time,
                                   current_system_time)
             await pWX.doTradeScenario(tradeAccount,
                                       dataAccount,
                                       trading_broker_pair,
-                                      BUY,
+                                      SELL,
                                       contractSize,
                                       spread,
                                       ORDER_COMMENT,
