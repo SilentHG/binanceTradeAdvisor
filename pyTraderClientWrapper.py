@@ -513,7 +513,7 @@ async def getActivePositions(client) -> list:
     for active_trade_data in active_trades_data:
         symbol = active_trade_data['symbol']
         positionId = active_trade_data['trade']['positionId']
-        stopLoss = active_trade_data['stopLoss']
+        stopLoss = active_trade_data['currentStopLoss']
         openPrice = active_trade_data['openPrice']
         temp_dict = {
             "positionId": positionId,
