@@ -511,17 +511,16 @@ async def getActivePositions(client) -> list:
     results = await asyncio.gather(*coroutines)
     symbolPrices = dict(zip(trading_pairs, results))
     for active_trade_data in active_trades_data:
-        if "currentStopLoss" not in active_trade_data:
-            active_positions.append(active_trade_data)
-            continue
-
-        symbol = active_trade_data['symbol']
         positionId = active_trade_data['trade']['positionId']
-        stopLoss = active_trade_data['currentStopLoss']
-        openPrice = active_trade_data['openPrice']
         temp_dict = {
             "positionId": positionId,
         }
+        if "currentStopLoss" not in active_trade_data:
+            active_positions.append(temp_dict)
+            continue
+        symbol = active_trade_data['symbol']
+        stopLoss = active_trade_data['currentStopLoss']
+        openPrice = active_trade_data['openPrice']
         actionType = active_trade_data['actionType']
         if actionType == ORDER_TYPE_BUY:
             current_symbol_price = symbolPrices[symbol]['ask']
