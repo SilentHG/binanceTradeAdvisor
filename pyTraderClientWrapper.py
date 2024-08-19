@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import pytz
 import requests
 from binance.enums import HistoricalKlinesType
+from binance import Client
 
 from strategy import log_error, log_general_error
 
@@ -101,6 +102,9 @@ def placeTrade(client, symbol, action_type, volume, stop_loss, comment):
     #                                comment=comment)
     #     if result is not None:
     #         return {"positionId": result, "actionType": action_type, "volume": volume, "stopLoss": stop_loss}
+    Client.futures_create_order()
+    Client.staus
+    Client.get_subaccount_futures_positionrisk()
 
     return {"positionId": random.randint(1, 1000), "actionType": action_type, "volume": volume, "stopLoss": stop_loss}
 
